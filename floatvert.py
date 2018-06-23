@@ -74,7 +74,7 @@ class generic(object):
 			return list
 		if self == 'dict':
 			list = {args.index(arg): float('%.3F'%round(arg, 1)) for arg in args}
-			print(list)
+			# print(list)
 			return(list)
 		else:
 			pass
@@ -106,8 +106,12 @@ if __name__=="__main__":
 	# return a dictionary and see the keys assigned to x, y, z
 	shortcoord = x, y, z = generic.shortfloat('dict', 2.55555555, 9.00000000012, 666.36) #send floats
 	print(x, y, z)
+	# dict key vars return populated 
+	print('Key \'x\':', shortcoord[x])
+	print('Key \'y\':', shortcoord[y])
+	print('Key \'z\':', shortcoord[z])
 	print('shortcoord:{}'.format(shortcoord))
 	# print('x:{}, y:{}, z:{}; shortcoord:{}; shortcoord[2]:{}'.format(x, y, z, shortcoord, shortcoord[2]))
 
 	# print(dir(generic.shortfloat))
-	# main()
+	# main(vars)
