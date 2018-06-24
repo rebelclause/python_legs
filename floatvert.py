@@ -64,13 +64,17 @@ class generic(object):
 			#consume 'self'
 			return args
 		if self == 'tuple': # special type according to self
-			list = [(float('%.3F'%round(arg, 1))) for arg in args]
-			print(list)
-			list = list[0], list[1], list[2] #convert to a tuple; omit if you want a list
+#			list = [(float('%.3F'%round(arg, 1))) for arg in args] # one string method
+			list = [('{:.1F}'.format(float(round(arg,1)))) for arg in args] # second string method
+#			list = list[0], list[1], list[2] #convert to a tuple; omit if you want a list
+			list = tuple(list) # universally extensible method of converting list to tuple			
 			return list
 		if self == 'list':
-			list = [(float('%.3F'%round(arg, 1))) for arg in args]
-			print(list)
+#			list = [(float('%.3F'%round(arg, 1))) for arg in args]
+			list = []
+			for arg in args: # third string method
+				short = round(arg, 1)/1
+				list.append(f'{short:.3F}')
 			return list
 		if self == 'dict':
 			list = {args.index(arg): float('%.3F'%round(arg, 1)) for arg in args}
