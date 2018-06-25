@@ -60,6 +60,17 @@ class generic(object):
 		currently: tuple, list\n
 		requires: a first parameter, as above, or generic placeholder of type int or str
 		"""
+		try: # handle an incoming generator of any length, getting all values
+			gen = [] #args
+			try:
+				while True:
+					gen.append(next(*args))
+			except StopIteration as _e:
+				ERR = _e.value
+			args = tuple(gen)
+		except:
+			pass
+		
 		if str(type(self)).__contains__('int'): #check for type
 			#consume 'self'
 			return args
@@ -119,3 +130,10 @@ if __name__=="__main__":
 
 	# print(dir(generic.shortfloat))
 	# main(vars)
+	
+	# send a list of values
+	myvals = [33.464636, 932.23423, 34232.2346432427]
+
+	# send a generator composed from a list, return a tuple
+	shortcoord = x, y, z = generic.shortfloat('tuple', (x for x in myvals) ) #send floats via generator
+	print('x:{}, y:{}, z:{}; shortcoord:{}; shortcoord[0]:{}\n'.format(x, y, z, shortcoord, shortcoord[0]))
