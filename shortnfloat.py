@@ -57,14 +57,16 @@ class generic(object):
 	@staticmethod
 	def shortfloat(self, *args): #if 'self' is here, you'll get an error, could make use of it as a switch
 		""" Send long floats to shorten them in various ways according to the first parameter passed.\n
-		currently: tuple, list\n
+		currently: tuple, list, dict\n
 		requires: a first parameter, as above, or generic placeholder of type int or str
+		* can also take a generator object in place of value args
 		"""
 		try: # handle an incoming generator of any length, getting all values
 			gen = [] #args
 			try:
 				while True:
-					gen.append(next(*args))
+					gen.append(next(*args)) # could use the default param instead of StopIteration to flag the generator's end ie. gen.append(next(*args, 'OXEoA'))
+					# print(next(*args)) # any next() iteration consumes another generator element, making it unrecoverable without another call
 			except StopIteration as _e:
 				ERR = _e.value
 			args = tuple(gen)
