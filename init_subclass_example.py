@@ -13,13 +13,13 @@ Goal:
     Create new app instances which automatically pick up the sub-classes via __init_subclass, and then expose them in a list attached to the app instance as yield(able) coroutines within an app loop, switching state in the process.
     Subclasses shouldn't need a name, as when they are instanced the app should be ready.
         Consider putting the entire class structure inside a function, so that the instances may not be created until the function is called, thereby initializing a major part of the application. Check to see if the globals are still available, as the docs on Data Model suggest should be the case with this construction of namespaces. 
-        When under def app(): and not instanced, __init_subclass invoked by calling app() gives:
+        When under def run(): and not instanced, __init_subclass invoked by calling run() gives:
             Meta <class '__main__.app.<locals>.ConcreteSub_0'>
             Meta <class '__main__.app.<locals>.ConcreteSub_1'>
             Meta <class '__main__.app.<locals>.ConcreteSub_2'>
             Meta <class '__main__.app.<locals>.ConcreteSub_3'>
             Meta <class '__main__.app.<locals>.ConcreteBase_0'>
-        When at the document root:
+        When classes are at the root:
             Meta <class '__main__.ConcreteSub_0'>
             Meta <class '__main__.ConcreteSub_1'>
             Meta <class '__main__.ConcreteSub_2'>
@@ -196,15 +196,18 @@ def run():
     return registry
     
     # 
-    # expose app classes    
+    # expose classes    
     #-------------------------------------------------------------------------
                       
 if __name__ == '__main__':
     
-    # return instanced run() classes to app
+    # return instanced
     app = run()
     
-    # now enquire objects in the run() local scope through app.reg, as above
+    # now interrogate objects in the run() local scope through app.reg, as above
+    print('Common names list,\n non-actionable:', app.registered, '\n')
+    
+    # the actionable classes
     for k, v in app.reg.items():
         print(k, str(v))
     
@@ -217,4 +220,3 @@ if __name__ == '__main__':
         input('Enter to run _goodbye()')
         
         app.reg['End']._goodbye()
-    
