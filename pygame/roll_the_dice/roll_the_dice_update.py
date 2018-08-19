@@ -2,14 +2,11 @@
 
 '''
 Created on Aug 14, 2018
-
 @author: Tim Pozza
 @email: rebelclause@gmail.com
 '''
 
 players = {'you': {'rolltotal': None, 'otherstuff': None }, 'me': {'rolltotal': None, 'otherstuff': None}}
-
-
 
 size = width, height = 256, 256
 white = 255, 255, 255
@@ -29,6 +26,9 @@ def reviewvals():
     print('Number of players: ', len(players)) # only counts the primary keys, the players                
     for player in players.keys():
         print(f"{player}: {players[player]['rolltotal']}")
+#    for player, attribdict in players.items():
+#        for key, value in attribdict.items():
+#            print(player, key, value)
     try:
         players = {k: players[k] for k in players.sorted(players, key=lambda x: players[x]['rolltotal'])}
     except:
@@ -73,11 +73,17 @@ def handle(event):
             
 def surfask():
     count = 1
+    # ask for the players names in turn
+    # verify all players are accounted for
+    # ask how many rolls per player per game
+    # ask how many games (or, when all round complete ask each player if they want to play again, if agree then do)
+    # ask whether this game is alternating between players or each player makes their rolls all at once
+    # being the game, asking each player to roll
     for player in players.keys():
         name = f"Player {count}'s name: {player}"
         print(name)
         rolls = 0
-        while rolls < 100:
+        while rolls < 3:
             for event in pygame.event.get():
                 if event.type == QUIT or (event.type == KEYDOWN and (event.key == K_ESCAPE or event.key == K_q)):
                     pygame.quit()
