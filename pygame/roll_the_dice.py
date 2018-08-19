@@ -25,10 +25,19 @@ DISPLAYSURF.fill(white)
 pygame.display.update()
 
 def reviewvals():
+    global players
     print('Number of players: ', len(players)) # only counts the primary keys, the players                
-    for player, attribdict in players.items():
-        for key, value in attribdict.items():
-            print(player, key, value)
+    for player in players.keys():
+        print(f"{player}: {players[player]['rolltotal']}")
+    try:
+        players = {k: players[k] for k in players.sorted(players, key=lambda x: players[x]['rolltotal'])}
+    except:
+        pass
+    finally:
+        if players:
+            return players
+        else:
+            pass
 
 def rolldice():
     from random import choice
@@ -88,8 +97,9 @@ def surfask():
         count = count + 1
     pygame.quit()
 
-print('## Then ## \n')
+#print('\n ## Then ##')
 reviewvals()
 surfask()
-print('## Now ## \n')
-reviewvals()
+print('\n ## Review ##')
+# review the vals and print the sorted dictionary
+print(reviewvals())
