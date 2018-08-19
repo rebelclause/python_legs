@@ -81,7 +81,7 @@ def update(chance, player):
     print('dice released')  
     print(f"{player} rolltotal: {players[player]['rolltotal']}")
 
-def cleanup(count):
+def cleanup(count, inter=None): 
     if count < len(players):
         print('Exiting early.')
     DISPLAYSURF.fill(black)
@@ -92,6 +92,11 @@ def cleanup(count):
     finally:
         pygame.quit()
         sys.exit()
+        
+def inter():
+        pygame.time.wait(1200)
+        DISPLAYSURF.fill(white)
+        pygame.display.flip() 
             
 def surfask():
     count = len(players) - len(players)
@@ -112,6 +117,7 @@ def surfask():
                     rolls = rolls + 1
                     
         count = count + 1
+        inter()
 
     print('\n## Review ##')
     print(reviewvals())
