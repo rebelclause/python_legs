@@ -6,18 +6,17 @@ Created on Aug 14, 2018
 @author: Tim Pozza
 @email: rebelclause@gmail.com
 '''
+import pygame, sys
+from pygame.locals import *
+
+
 
 players = {'you': {'rolltotal': None, 'otherstuff': None }, 'me': {'rolltotal': None, 'otherstuff': None}}
-
-
 
 size = width, height = 256, 256
 white = 255, 255, 255
 grey = 128, 129, 127
 black = 0, 0, 0
-
-import pygame
-from pygame.locals import *
 
 pygame.init()
 DISPLAYSURF = pygame.display.set_mode((size), 0, 32)
@@ -27,10 +26,12 @@ pygame.display.update()
 def reviewvals():
     global players
     print('Number of players: ', len(players)) # only counts the primary keys, the players                
-    for player in players.keys():
-        print(f"{player}: {players[player]['rolltotal']}")
+    for player, attribdict in players.items():
+        for key, value in attribdict.items():
+            print(f"{player}: {key} = {value}")
+    # just in case later we want to ask players for their names and players is empty
     try:
-        players = {k: players[k] for k in players.sorted(players, key=lambda x: players[x]['rolltotal'])}
+        players = {k: players[k] for k in sorted(players, key=lambda x: players[x]['rolltotal'], reverse=True)}
     except:
         pass
     finally:
@@ -38,7 +39,7 @@ def reviewvals():
             return players
         else:
             pass
-
+    
 def rolldice():
     from random import choice
     select = [1, 2, 3, 4, 5, 6]
@@ -70,36 +71,52 @@ def handle(event):
                 return
             else:
                 pass # start a timer and warn the player with a countdown when the roll will kick off
+
+def update(chance, player):
+    rolltotal = players[player]['rolltotal']
+    if rolltotal == None:
+        players[player]['rolltotal'] = chance
+    else:
+        players[player]['rolltotal'] = rolltotal + chance
+    print('dice released')  
+    print(f"{player} rolltotal: {players[player]['rolltotal']}")
+
+def cleanup(count):
+    if count < len(players):
+        print('Exiting early.')
+    DISPLAYSURF.fill(black)
+    pygame.display.flip()
+    try:
+        pygame.quit()
+        sys.exit()
+    finally:
+        pygame.quit()
+        sys.exit()
             
 def surfask():
-    count = 1
+    count = len(players) - len(players)
     for player in players.keys():
-        name = f"Player {count}'s name: {player}"
+        name = f"\nPlayer {count}'s name: {player}"
         print(name)
         rolls = 0
-        while rolls < 100:
+        while rolls < 5:
             for event in pygame.event.get():
                 if event.type == QUIT or (event.type == KEYDOWN and (event.key == K_ESCAPE or event.key == K_q)):
-                    pygame.quit()
+                    cleanup(count)
                 if event.type == KEYDOWN:
                     print('warming dice -- ready to throw')
                     handle(event)
                     
                     chance = rolldice()
-                    rolltotal = players[player]['rolltotal']
-                    if rolltotal == None:
-                        players[player]['rolltotal'] = chance
-                    else:
-                        players[player]['rolltotal'] = rolltotal + chance
-                    print('dice released')  
-                    print(f"{player} rolltotal: {players[player]['rolltotal']}")
+                    update(chance, player)
                     rolls = rolls + 1
+                    
         count = count + 1
-    pygame.quit()
 
-#print('\n ## Then ##')
+    print('\n## Review ##')
+    print(reviewvals())
+    cleanup(count)
+
+print('\n## Roll ##')
 reviewvals()
 surfask()
-print('\n ## Review ##')
-# review the vals and print the sorted dictionary
-print(reviewvals())
