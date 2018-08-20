@@ -27,7 +27,21 @@ Goal:
             Meta <class '__main__.ConcreteBase_0'>
 
 """
+import sys
 import traceback # for callable name
+from functools import wraps
+import asyncio
+
+
+
+def tracename(orig_func):
+    @wraps(orig_func)
+    def wrapper(*args, **kwargs):
+        (filename,line_number,function_name,text)=traceback.extract_stack()[-2]
+        def_name = text[:text.find('=')].strip()
+        print(def_name)
+        return def_name
+    return wrapper
 
 
 def run():
@@ -36,6 +50,8 @@ def run():
     
         registered = []
         reg = {}
+        app = {}
+        sub_count = 0
 #        basename_instance = None
     
         def __init__(self):
@@ -51,12 +67,18 @@ def run():
     
         def __init_subclass__(self):
             
+            (filename,line_number,function_name,text)=traceback.extract_stack()[-3]
+            def_name = text[:text.find('=')].strip()
+            
             # this prints if the file hits the interpreter even if Registry
             # or its subclasses aren't themselves instantiated
             # 
 #            print('Meta', self)
             # pre reg{} look
 #            self.app.append(self)
+            
+            self.app[f'{def_name}_{Registry.sub_count}'] = [self]
+            Registry.sub_count +=1
                 
             if self.__name__ == 'ConcreteSub_0':
                 self.sub = self.__name__
@@ -121,7 +143,7 @@ def run():
             self.reg[def_name] = self    
             print('Sub', self)        
              
-           
+                   
     class ConcreteSub_3(Registry):
         ''' '''
         def __init__(self, *args):
@@ -137,29 +159,21 @@ def run():
             print('Sub', self)
         
         def _goodbye(self):
-            print("""
-                  It's been a good run.
+            print("""  
+                Thanks for stopping by.
                   
-                  Thanks for coming by.
-                  
-                  See you next time?
-                  
-                  Over the next few iterations
-                  
-                  I'll try to sequence with
-                  
-                  a coroutine and possibly use 
-                  
-                  the same to invite 
-                  
-                  concurrency/event handling, 
-                  
-                  you know, without class handlers.
-                 
-                  
-                  """)
-          
+                The coroutine needs some work,
+                as demonstrations go.
                 
+                It neither implements a separate
+                event loop, nor features concurrency,
+                as I'd hoped at this point to feature.
+                
+                Other examples are forthcoming, or
+                can already be found here.
+                  """)
+            
+            
     class ConcreteBase_0(Registry, Events):
         ''' '''
         def __init__(self, *args):
@@ -173,6 +187,7 @@ def run():
             self.registered.append([self.name, self.sub])
             self.reg[def_name] = self
             print('Sub', self)
+      
             
     Login = ConcreteSub_0('Begin')
     print(Login.sub)
@@ -201,22 +216,57 @@ def run():
                       
 if __name__ == '__main__':
     
+    def cleanup():
+        app.reg['End']._goodbye()
+        loop.close()
+        try:
+            sys.exit()
+        finally:
+            sys.exit()
+    
+    def review(app):  
+        # now interrogate objects in the run() local scope through app.reg, as above
+        print('Common names list,\n non-actionable:', app.registered)
+        print('\nCallers in registry.app', app.app)
+        # the actionable classes
+        print("\nAll app keys: ", app.reg.keys())
+        for k, v in app.reg.items():
+            print(f"item: {k} = {str(v)}")
+        print("\nSingle key 'Login': ", app.reg['Login'].sub)
+    
+#     import asyncio
+#     file:///usr/share/doc/python3.6/html/library/asyncio-task.html
+    async def slow_operation(future):
+#         code to run in place of sleep
+        await asyncio.sleep(5)
+        future.set_result('Future is done!')
+    
     # return instanced
     app = run()
     
-    # now interrogate objects in the run() local scope through app.reg, as above
-    print('Common names list,\n non-actionable:', app.registered, '\n')
-    
-    # the actionable classes
-    for k, v in app.reg.items():
-        print(k, str(v))
-    
-    print(app.reg.keys())
+    # setup async loop
+    loop = asyncio.get_event_loop()
+    future = asyncio.Future()
+    asyncio.ensure_future(slow_operation(future))
 
-    print(app.reg['Login'].sub)
-    
-    keypress = ' '
-    while True:
-        input('Enter to run _goodbye()')
-        
-        app.reg['End']._goodbye()
+
+    keypress = ''
+    # get character = chr(93) and ord()
+
+    while keypress != 'q' or (chr(27)): # or chr(27): # chr(27) and ord(0x01b) are key <ESC> 
+        keypress = input("\n's' to show, 'q' to quit\n\t >> ")
+        if keypress == 's':
+            review(app)
+        if keypress == 'q':
+            cleanup()
+        else:
+            # start the async loop now and print the result later
+            # you will need to hit enter at the prompt
+            # type and enter q or s while waiting  
+#             loop.run_until_complete(future)
+            try: 
+                print(future.result())
+            except BaseException as e:
+                print('Future is not ready/set yet. Enter to try again.', e)
+                loop.run_until_complete(future)
+    cleanup()
